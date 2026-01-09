@@ -13,7 +13,7 @@ class sequence():
         self.id = id
         self.sequence = sequence.upper()
 
-    def print_sequence_lengths(self):
+    def sequence_lengths(self):
         return len(self.sequence)
     
     def base_count(self):
@@ -24,6 +24,8 @@ class sequence():
             return counts
     
     def gc_content(self):
+        if not self.sequence:
+             return 0.0
         g = self.sequence.count("G")
         c = self.sequence.count("C")
         total = sum(self.sequence.count(b) for b in self.valid)

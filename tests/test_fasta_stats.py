@@ -2,6 +2,7 @@ import pytest
 from bio_seq_v1.stats import sequence
 from bio_seq_v1.fasta import fasta_parser
 fasta_seq = "tests/data/tiny.fasta"
+single_seq = "tests/data/single.fasta"
 
 #test fasta parser
 def test_fasta_parser():
@@ -11,7 +12,10 @@ def test_fasta_parser():
     first_seq = parsed[0]
     assert first_seq.sequence == "ATGCGTACGTAGCTAGTTAGCGATCGGGGCTAGCTAGCTAGCTAG"
     assert first_seq.id == "seq1"
-
+#test length of sequence
+def test_seq_length():
+    parsed = fasta_parser(fasta_seq)
+    assert parsed[0].sequence_lengths() == 45
 #test gc content     
 def test_gc_content():
     parsed = fasta_parser(fasta_seq)
@@ -46,3 +50,15 @@ def test_single_base():
 def test_multiple_fasta_entries():
     parsed = fasta_parser(fasta_seq)
     assert len(parsed) == 3
+
+def test_single_fasta_entries():
+    parsed = fasta_parser(single_seq)
+    assert len(parsed) == 1
+
+def test_ambig_codes():
+    parsed = fasta_parser(single_seq)
+    assert parsed[0].rev_complement() == "KDMAAATTTCCCGGGBYACCCGGGTTTAAACCC"
+
+def test_empty_sequence():
+    seq = sequence("id", "")
+    assert seq.gc_content() == 0.0
