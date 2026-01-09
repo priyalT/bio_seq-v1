@@ -16,7 +16,7 @@ def print_gc_content_table(sequences):
 def print_revcomp(sequences):
     rev_list = rev_complement(sequences)
     for item in rev_list:
-        print(f">{item['id']}_revcomp")
+        print(f">{item['id']} reverse complement")
         print(item["reverse complement"])
         print("-" * 30)
 
@@ -54,6 +54,9 @@ parser.add_argument("--summary", help="Print summary statistics", action="store_
 args = parser.parse_args()
 
 sequences = fasta_parser(args.file)
+if not any([args.length, args.gc, args.revcomp, args.basecount, args.summary]):
+    print_summary(sequences)
+    exit()
 if not sequences:
     raise ValueError("No sequences found in FASTA file")
 
