@@ -20,6 +20,12 @@ Clone the repository:
 git clone https://github.com/yourusername/bio_seq_v1.git
 cd bio_seq_v1
 ```
+
+Install dependencies
+```bash
+pip install tabulate
+```
+
 Install CLI globally (optional, but recommended):
 ```bash
 pip install -e .
