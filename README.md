@@ -18,11 +18,11 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/yourusername/bio_seq_v1.git
-cd bio_seq_
+cd bio_seq_v1
 ```
-Install dependencies:
+Install CLI globally (optional, but recommended):
 ```bash
-pip install tabulate
+pip install -e .
 ```
 
 ### Input format
@@ -40,8 +40,10 @@ GGGTTTAAACCCGGGCCCGGGAAATTT
 ### How to use it?
 Run the CLI using:
 ```bash
-python cli.py -f test.fasta (your filename here)
+bioseq -f test.fasta (your filename here)
 ```
+If no flags are provided, it prints a full summary (lengths, GC content, base counts).
+
 ---
 Description of the flags:
 | Flag | Description |
@@ -55,17 +57,18 @@ Description of the flags:
 
 ### Some example commands and outputs
 ```bash
-python cli.py -f test.fasta --gc
+bioseq -f test.fasta --gc
 ```
 <img width="210" height="134" alt="Screenshot 2026-01-09 at 5 30 32 AM" src="https://github.com/user-attachments/assets/b52de267-4820-4fca-b596-bf2d1fae6b8b" />
 
 ```bash
-python cli.py -f test.fasta --revcomp
+bioseq -f test.fasta --revcomp
 ```
 <img width="368" height="140" alt="Screenshot 2026-01-09 at 5 31 09 AM" src="https://github.com/user-attachments/assets/06952c26-9371-4bfa-83d9-07c69a776262" />
 
 ### Supported nucleotide bases
-The tool supports standard and IUPAC nucleotide codes, i.e ACGTUNRYSWKMBDHV-.
+The tool supports standard and IUPAC nucleotide codes, i.e 
+A, C, G, T, U, N, R, Y, S, W, K, M, B, D, H, V, -, .
 
 ### Project structure
 ```
