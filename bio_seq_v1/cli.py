@@ -39,38 +39,34 @@ def print_summary(sequences):
     print("BASE COMPOSITION")
     print_base_count(sequences)
 
-
-parser = argparse.ArgumentParser()
-
-parser.add_argument("--file", "-f", help="Path to the FASTA file", required=True)
-parser.add_argument("--length", "-l", help ="Compute sequence length per sequence", action="store_true")
-parser.add_argument("--gc", help ="Compute GC% per sequence", action="store_true")
-parser.add_argument("--revcomp", "-rc", help ="Compute reverse complements per sequence", action="store_true")
-parser.add_argument("--basecount", "-b", help ="Compute total count for bases per sequence", action="store_true")
-parser.add_argument("--summary", help="Print summary statistics", action="store_true")
-args = parser.parse_args()
-
-sequences = fasta_parser(args.file)
-
-if not any([args.length, args.gc, args.revcomp, args.basecount, args.summary]):
-    print_summary(sequences)
-    exit()
-if not sequences:
-    raise ValueError("No sequences found in FASTA file")
-
-if args.length:
-    print_sequence_lengths_formatted(sequences)
-    print()
-if args.gc:
-    print_gc_content_table(sequences)
-    print()
-if args.revcomp:
-    print_revcomp(sequences)
-    print()
-if args.basecount:
-    print_base_count(sequences)
-    print()
-if args.summary:
-    print_summary(sequences)
-    exit()
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--file", "-f", help="Path to the FASTA file", required=True)
+    parser.add_argument("--length", "-l", help ="Compute sequence length per sequence", action="store_true")
+    parser.add_argument("--gc", help ="Compute GC content per sequence", action="store_true")
+    parser.add_argument("--revcomp", "-rc", help ="Compute reverse complements per sequence", action="store_true")
+    parser.add_argument("--basecount", "-b", help ="Compute total count for bases per sequence", action="store_true")
+    parser.add_argument("--summary", help="Print summary statistics", action="store_true")
+    args = parser.parse_args()
+    sequences = fasta_parser(args.file)
+    if not any([args.length, args.gc, args.revcomp, args.basecount, args.summary]):
+        print_summary(sequences)
+        exit()
+    if not sequences:
+        raise ValueError("No sequences found in FASTA file")
+    if args.length:
+        print_sequence_lengths_formatted(sequences)
+        print()
+    if args.gc:
+        print_gc_content_table(sequences)
+        print()
+    if args.revcomp:
+        print_revcomp(sequences)
+        print()
+    if args.basecount:
+        print_base_count(sequences)
+        print()
+    if args.summary:
+        print_summary(sequences)
+        exit()
 
