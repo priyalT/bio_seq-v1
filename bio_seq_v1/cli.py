@@ -4,7 +4,7 @@ from bio_seq_v1.fasta import fasta_parser
 from bio_seq_v1.stats import sequence
 
 def print_sequence_lengths_formatted(sequences):
-    table = [[s.id, s.sequence_lengths()] for s in sequences]
+    table = [[s.id, s.sequence_length()] for s in sequences]
     print(tabulate(table, headers=["Sequence ID", "Length"], tablefmt="grid"))
 
 def print_gc_content_table(sequences):
