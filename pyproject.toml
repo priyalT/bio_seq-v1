@@ -29,7 +29,8 @@ build-backend = "setuptools.build_meta"
 
 # Optional: tool configurations
 [tool.setuptools.packages.find]
-where = ["bio_seq_v1"]
+where = ["."]
+include = ["bio_seq_v1*"]
 
 [tool.pytest.ini_options]
 minversion = "7.0"

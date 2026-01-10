@@ -1,104 +1,51 @@
-import warnings
+# FASTA file parsing and input validation utilities
+#importing class sequence from stats.py
+#importing Path from pathlib to validate the input path and raise errors
+from bio_seq_v1.stats import sequence
+from pathlib import Path
 
-class sequence():
-    """
-    Represents a biological sequence (DNA/RNA) with methods to calculate 
-    length, base counts, GC content, and reverse complement.
+#defining the function for validating input path
+def validate_input_path(filename):
+    path = Path(filename) #setting the filename's path to a variable
+    if not path.exists(): #if path does not exist
+        raise FileNotFoundError(f"File not found: {path}") #raise the filenotfound error
+    if not path.is_file(): #if path is not a file (maybe the path provided is that of a directory)
+         raise IsADirectoryError(f"Not a file: {path}") #raise isadirectoryerror
+    if path.stat().st_size == 0: #if the file size is zero (empty file)
+         raise ValueError(f"File is empty.") #raise Valueerror
+    return path 
 
-    Attributes:
-        id (str): Identifier for the sequence.
-        sequence (str): Uppercase string of the sequence.
-    """
-
-    revcomp_dict = {
-        "A":"T", "T":"A", "G":"C", "C":"G", "U":"A",
-        "R":"Y", "Y":"R", "S":"S", "W":"W",
-        "K":"M", "M":"K", "B":"V", "D":"H",
-        "H":"D", "V":"B", "N":"N"
-    }
+#defining the fasta parser function with input of the given file
+def fasta_parser(filename):
+    all_seq =[] #creating an empty list to store sequence objects (id + sequence)
+    current_id = None #setting current id to none
+    current_seq = [] #creating an empty list for only sequences
+    valid = set("ACGTUNRYSWKMBDHV-.") #creating a set for valid bases
+    path = validate_input_path(filename) #a variable for the output of validate_input_path function (described above)
     
-    valid = "ACGTUNRYSWKMBDHV-."
+    with path.open('r') as fasta: #opening the file and reading it
+        for linenum, line in enumerate(fasta, start=1): #running the loop on lines and numerating each line
+            line = line.strip() #removing whitespace if any
 
-    def __init__(self, id, sequence):
-        """
-        Initialize a Sequence object with an ID and sequence string.
+            if not line: #if the line is empty (i.e no whitespaces), skip it    
+                continue 
 
-        Args:
-            id (str): Identifier for the sequence.
-            sequence (str): Sequence string containing valid bases.
-
-        Raises:
-            ValueError: If the sequence is empty or contains invalid characters.
-        """
-        if not sequence:
-             raise ValueError(f"Sequence for ID '{id}' is empty")
-        invalid_chars = set(sequence.upper())-set(self.valid)
-        if invalid_chars:
-             raise ValueError(f"Sequence '{id}' contains invalid characters: {invalid_chars}")
-        self.id = id 
-        self.sequence = sequence.upper()
-             
-    def sequence_lengths(self):
-        """
-        Return the length of the sequence.
-
-        Returns:
-            int: Number of bases in the sequence.
-        """
-        return len(self.sequence)
-    
-    def base_count(self):
-        """
-        Count the occurrences of each valid base in the sequence.
-
-        Returns:
-            dict: Dictionary with bases as keys and counts as values.
-
-        Notes:
-            Issues a warning if invalid characters are found.
-        """
-        counts = {b:0 for b in self.valid}
-        for b in self.sequence:
-            if b in counts:
-                counts[b] += 1
+            if line.startswith(">"): #if the line starts with ">", it is probably the header and the indication for starting a new sequence
+                if current_id is not None: #if there is information stored in current_id (i.e name of the sequence on which the loop is running)
+                    all_seq.append(sequence(current_id, "".join(current_seq))) ##append the completed sequence object to the list
+                current_id = line[1:] #then, let current_id store the id (ignoring the ">")
+                current_seq = [] #reset sequence accumulator for the new record 
             else:
-                 warnings.warn(f"Invalid character in id: '{self.id}' and sequence: '{self.sequence}")
-        return counts
-    
-    def gc_content(self):
-        """
-        Calculate the GC content percentage of the sequence.
+                if current_id is None: #if current_id is none (i.e loop is at the sequence, yet id is none)
+                     raise ValueError(f"Sequence data found before header on line {linenum}") #raise error
+                seq_line = line.upper() #set the line of sequence to upper case
+                if all(base in valid for base in seq_line): #if all the bases in seq_line also exist in the valid set
+                     current_seq.append(seq_line) #then append it to current_seq
+                else: 
+                     raise ValueError(f"Invalid character in sequence '{current_id}':'{seq_line}' " #otherwise raise error and inform user about the sequence, id, and line
+                                      f"on line: {linenum}")
 
-        Returns:
-            float: GC content as a percentage.
+        if current_id is not None: #at the end of the loop, save the last id, sequence
+                    all_seq.append(sequence(current_id, "".join(current_seq))) 
 
-        Raises:
-            ValueError: If the sequence contains no valid bases.
-        """
-        if not self.sequence:
-             return 0.0
-        g = self.sequence.count("G")
-        c = self.sequence.count("C")
-        total = sum(self.sequence.count(b) for b in self.valid)
-        if total == 0:
-             raise ValueError("Sum of total bases is 0 due to invalid bases as input")
-        return ((g+c)/total)*100
-
-    def rev_complement(self):
-        """
-        Compute the reverse complement of the sequence.
-
-        Returns:
-            str: Reverse complement string.
-
-        Raises:
-            ValueError: If the sequence contains invalid bases.
-        """
-        reverse = self.sequence[::-1]
-        complement = ""
-        for b in reverse:
-            if b in self.revcomp_dict:
-                  complement += self.revcomp_dict[b]
-            else:
-                 raise ValueError(f"Sequence has invalid characters, id: '{self.id}', sequence: '{self.sequence}'")
-        return complement
+    return all_seq  #return the list of sequence objects
