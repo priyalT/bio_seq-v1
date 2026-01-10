@@ -37,7 +37,7 @@ class sequence():
         self.id = id 
         self.sequence = sequence.upper()
              
-    def sequence_lengths(self): 
+    def sequence_length(self): 
         """
         Return the length of the sequence.
 
@@ -79,7 +79,7 @@ class sequence():
              return 0.0 
         g = self.sequence.count("G") 
         c = self.sequence.count("C") 
-        total = sum(self.sequence.count(b) for b in self.valid) 
+        total = self.sequence_length() 
         return ((g+c)/total)*100 
     
     def rev_complement(self):
